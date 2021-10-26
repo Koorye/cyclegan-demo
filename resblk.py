@@ -1,8 +1,11 @@
-import torch
 from torch import nn
 
 
 class Resblk(nn.Module):
+    """
+    残差块单元
+    """
+
     def __init__(self, in_channels):
         super(Resblk, self).__init__()
 
@@ -22,6 +25,5 @@ class Resblk(nn.Module):
 
 
 if __name__ == '__main__':
-    R = Resblk(2)
-    x = torch.randn(1, 2, 64, 64)
-    print(R(x).size())
+    R = Resblk(3)
+    print(R)

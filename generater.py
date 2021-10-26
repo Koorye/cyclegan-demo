@@ -1,9 +1,13 @@
-import torch
 from torch import nn
 from resblk import Resblk
 
 
 class Generater(nn.Module):
+    """
+    生成器，输入A(B)类图片，输出B(A)类图片
+    [b,3,img_size,img_size] -[G]-> [b,3,img_size,img_size]
+    """
+
     def __init__(self):
         super(Generater, self).__init__()
 
@@ -69,5 +73,4 @@ class Generater(nn.Module):
 
 if __name__ == '__main__':
     G = Generater()
-    x = torch.randn(1, 3, 64, 64)
-    print(G(x).size())
+    print(G)

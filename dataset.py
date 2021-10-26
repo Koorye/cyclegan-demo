@@ -6,6 +6,12 @@ from torch.utils.data import Dataset
 
 
 class CycleDataset(Dataset):
+    """
+    用于CycleGAN的数据集
+    分别读取A和B的目录，目录中包含两类图片
+    每个获取元素，将返回一个字典 {'A': A_Image, 'B': B_Image}
+    """
+
     def __init__(self, root, transform=None, mode='train'):
         self.transform = transform
 
