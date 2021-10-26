@@ -63,7 +63,7 @@ train_loader = get_dataloader(data_root,
 
 # 读取历史模型
 print('读取模型、优化器、误差')
-G_A2B, G_B2A, D_A, D_B = load_models(
+G_A2B, G_B2A, D_A, D_B, last_epoch = load_models(
     historical_epochs, output_model_root, image_size)
 
 # 初始化优化器
@@ -86,8 +86,8 @@ print('加载Visdom...')
 viz = visdom.Visdom()
 g_loss, d_a_loss, d_b_loss = [], [], []
 print('=========================================')
-for epoch in range(epochs-historical_epochs):
-    epoch += historical_epochs
+for epoch in range(epochs-last_epoch):
+    epoch += last_epoch
     pbar = tqdm(enumerate(train_loader), total=len(
         train_loader), desc=f'第{epoch+1}次训练')
     G_A2B.train()
@@ -224,4 +224,4 @@ for epoch in range(epochs-historical_epochs):
             output_model_epoch_root, 'D_A.pth'))
         torch.save(D_B.state_dict(), os.path.join(
             output_model_epoch_root, 'D_B.pth'))
-        print(f'第{epoch+1}次训练，模型以保存至{output_model_root}')
+        print(f'训练完成，模型以保存至{output_model_epoch_root}')

@@ -88,6 +88,7 @@ def load_models(historical_epochs, output_model_root, image_size):
                     last_epoch = epoch
         historical_root = os.path.join(output_model_root, f'epoch{epoch}')
     else:
+        last_epoch = historical_epochs
         historical_root = os.path.join(output_model_root, f'epoch{historical_epochs}')
 
     G_A2B.load_state_dict(torch.load(os.path.join(historical_root, 'G_A2B.pth')))
@@ -95,7 +96,7 @@ def load_models(historical_epochs, output_model_root, image_size):
     D_A.load_state_dict(torch.load(os.path.join(historical_root, 'D_A.pth')))
     D_B.load_state_dict(torch.load(os.path.join(historical_root, 'D_B.pth')))
 
-    return G_A2B, G_B2A, D_A ,D_B
+    return G_A2B, G_B2A, D_A ,D_B, last_epoch
 
 
 
