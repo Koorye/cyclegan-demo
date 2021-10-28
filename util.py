@@ -6,7 +6,7 @@ from torchvision.transforms import transforms
 
 from dataset import CycleDataset
 from discriminator import Discriminator
-from generater_v2 import Generater
+from generater import Generater
 
 if torch.cuda.is_available():
     device = torch.device('cuda')
@@ -97,4 +97,3 @@ def load_models(historical_epochs, output_model_root, image_size):
     D_B.load_state_dict(torch.load(os.path.join(historical_root, 'D_B.pth')))
 
     return G_A2B, G_B2A, D_A ,D_B, last_epoch
-    

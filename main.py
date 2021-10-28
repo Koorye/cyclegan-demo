@@ -7,6 +7,7 @@ from torch.optim.lr_scheduler import LambdaLR
 from tqdm import tqdm
 
 from replay_buffer import ReplayBuffer
+from test import generate_images
 from util import get_dataloader, denormalize, load_models
 
 # 初始化参数
@@ -28,19 +29,22 @@ from util import get_dataloader, denormalize, load_models
 seed = 123
 data_root = 'data/summer2winter'
 output_model_root = 'output/model'
+output_img_root = 'output/img'
 image_size = 256
-batch_size = 16
+batch_size = 1
 lr = 2e-4
 betas = (.5, .999)
 epochs = 200
 historical_epochs = 0
 decay_epoch = 3
-save_every = 10
+save_every = 5
 loss_range = 1000
 
 # 创建输出目录
 if not os.path.exists(output_model_root):
     os.makedirs(output_model_root)
+if not os.path.exists(output_img_root):
+    os.makedirs(output_img_root)
 
 # 检测CUDA是否可用
 print('=========================================')
@@ -225,8 +229,12 @@ for epoch in range(epochs-last_epoch):
     D_A_lr.step()
     D_B_lr.step()
 
-    # 保存模型
+    # 生成图片和保存模型
     if (epoch+1) % save_every == 0:
+        A2B_img, B2A_img = generate_images(G_A2B, G_B2A)
+        A2B_img.save(os.path.join(output_img_root, f'A2B_epoch{epoch+1}.png'))
+        B2A_img.save(os.path.join(output_img_root, f'B2A_epoch{epoch+1}.png'))
+
         output_model_epoch_root = os.path.join(
             output_model_root, f'epoch{epoch+1}')
         os.mkdir(output_model_epoch_root)

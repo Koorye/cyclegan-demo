@@ -22,17 +22,6 @@ if torch.cuda.is_available():
 else:
     device = torch.device('cpu')
 
-G_A2B, G_B2A, D_A, D_B = load_models(
-    historical_epochs, output_model_root, image_size)
-
-test_loader = get_dataloader(data_root, image_size, batch_size, 'test')
-test_data = next(iter(test_loader))
-A_data, B_data = test_data['A'].to(device), test_data['B'].to(device)
-
-output_A_data = G_B2A(B_data)
-output_B_data = G_A2B(A_data)
-
-
 def draw_images(data, ncol):
     with torch.no_grad():
         b, c, w, h = data.size(0), data.size(1), data.size(2), data.size(3)
@@ -68,12 +57,33 @@ def concat_images(imgs, ncol):
             row, col = row+1, 0
     return target
 
-real_A_imgs = draw_images(A_data, 4)
-real_B_imgs = draw_images(B_data, 4)
-output_A_imgs = draw_images(output_A_data, 4)
-output_B_imgs = draw_images(output_B_data, 4)
+def generate_images(G_A2B, G_B2A):
+    """
+    生成A -> B和B -> A的图片
+    : param G_A2B: A2B生成器
+    : param G_A2B: B2A生成器
+    : return: A2B_img, B2A_img 
+    """
 
-A2B_img = concat_images([real_A_imgs, output_B_imgs], 2)
-B2A_img = concat_images([real_B_imgs, output_A_imgs], 2)
-A2B_img.save(os.path.join(output_img_root, 'A2B.png'))
-B2A_img.save(os.path.join(output_img_root, 'B2A.png'))
+    test_loader = get_dataloader(data_root, image_size, batch_size, 'test')
+    test_data = next(iter(test_loader))
+    A_data, B_data = test_data['A'].to(device), test_data['B'].to(device)
+
+    output_A_data = G_B2A(B_data)
+    output_B_data = G_A2B(A_data)
+    real_A_imgs = draw_images(A_data, 4)
+    real_B_imgs = draw_images(B_data, 4)
+    output_A_imgs = draw_images(output_A_data, 4)
+    output_B_imgs = draw_images(output_B_data, 4)
+
+    A2B_img = concat_images([real_A_imgs, output_B_imgs], 2)
+    B2A_img = concat_images([real_B_imgs, output_A_imgs], 2)
+    
+    return A2B_img, B2A_img
+    
+if __name__ == '__main__':
+    G_A2B, G_B2A, _, _, _ = load_models(
+    historical_epochs, output_model_root, image_size)
+    A2B_img, B2A_img = generate_images(G_A2B, G_B2A)
+    A2B_img.save(os.path.join(output_img_root, 'A2B.png'))
+    B2A_img.save(os.path.join(output_img_root, 'B2A.png'))
