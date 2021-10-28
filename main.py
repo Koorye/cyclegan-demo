@@ -3,8 +3,8 @@ import random
 import os
 import torch
 import visdom
+from torch.optim.lr_scheduler import LambdaLR
 from tqdm import tqdm
-
 
 from replay_buffer import ReplayBuffer
 from util import get_dataloader, denormalize, load_models
@@ -22,18 +22,20 @@ from util import get_dataloader, denormalize, load_models
 # - 0表示不沿用历史模型
 # - >0表示对应训练次数的模型
 # - -1表示最后一次训练的模型
+# decay_epoch: 从第几次训练开始衰减学习率
 # save_every: 保存频率
 # loss_range: Loss的显示范围
 seed = 123
-data_root = 'D:/code/cyclegan-demo/data/summer2winter'
+data_root = 'data/summer2winter'
 output_model_root = 'output/model'
-image_size = 64
+image_size = 256
 batch_size = 16
-lr = 4e-5
+lr = 2e-4
 betas = (.5, .999)
-epochs = 500
-historical_epochs = -1
-save_every = 1
+epochs = 200
+historical_epochs = 0
+decay_epoch = 3
+save_every = 10
 loss_range = 1000
 
 # 创建输出目录
@@ -72,6 +74,14 @@ G_optim = torch.optim.Adam(itertools.chain(G_A2B.parameters(),
                            lr=lr, betas=betas)
 D_A_optim = torch.optim.Adam(D_A.parameters(), lr=lr, betas=betas)
 D_B_optim = torch.optim.Adam(D_B.parameters(), lr=lr, betas=betas)
+
+# 初始化学习率调度器
+def lr_lambda(ep):
+    return 1.0 - max(0, ep + last_epoch - decay_epoch) / (epochs - decay_epoch)
+
+G_lr = LambdaLR(G_optim, lr_lambda=lr_lambda)
+D_A_lr = LambdaLR(D_A_optim, lr_lambda=lr_lambda)
+D_B_lr = LambdaLR(D_B_optim, lr_lambda=lr_lambda)
 
 # 初始化误差
 cycle_loss = torch.nn.L1Loss().to(device)
@@ -210,6 +220,10 @@ for epoch in range(epochs-last_epoch):
         if loss_range != -1 and len(d_b_loss) > loss_range:
             d_b_loss.pop(0)
         viz.line(d_b_loss, win='判别器B Loss', opts={'title': '判别器B Loss'})
+    
+    G_lr.step()
+    D_A_lr.step()
+    D_B_lr.step()
 
     # 保存模型
     if (epoch+1) % save_every == 0:
