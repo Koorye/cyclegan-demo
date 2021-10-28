@@ -99,6 +99,7 @@ TODO
 - `dataset.py` 数据集
 - `discriminator.py` 判别器
 - `generater.py` 生成器
+- `generater_v2.py` 使用上采样+卷积替换反卷积版本的生成器
 - `main.py` 主程序
 - `replay_buffer.py` 缓冲区
 - `resblk.py` 残差块
