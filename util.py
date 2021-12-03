@@ -7,6 +7,7 @@ from torchvision.transforms import transforms
 from dataset import CycleDataset
 from discriminator import Discriminator
 from generater import Generater
+# from generater_v2 import Generater
 
 if torch.cuda.is_available():
     device = torch.device('cuda')

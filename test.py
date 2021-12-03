@@ -1,5 +1,4 @@
 import math
-import matplotlib.pyplot as plt
 import numpy as np
 import os
 from PIL import Image
@@ -7,10 +6,9 @@ import torch
 
 from util import load_models, get_dataloader, denormalize
 
-historical_epochs = -1
 batch_size = 16
-image_size = 64
-data_root = 'data/summer2winter'
+image_size = 256
+data_root = 'data/photo2anime'
 output_model_root = 'output/model'
 output_img_root = 'output/img'
 
@@ -82,6 +80,7 @@ def generate_images(G_A2B, G_B2A):
     return A2B_img, B2A_img
     
 if __name__ == '__main__':
+    historical_epochs = -1
     G_A2B, G_B2A, _, _, _ = load_models(
     historical_epochs, output_model_root, image_size)
     A2B_img, B2A_img = generate_images(G_A2B, G_B2A)

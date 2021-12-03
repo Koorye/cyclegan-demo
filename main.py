@@ -27,18 +27,18 @@ from util import get_dataloader, denormalize, load_models
 # save_every: 保存频率
 # loss_range: Loss的显示范围
 seed = 123
-data_root = 'data/summer2winter'
+data_root = 'data/photo2anime'
 output_model_root = 'output/model'
 output_img_root = 'output/img'
 image_size = 256
 batch_size = 1
 lr = 2e-4
 betas = (.5, .999)
-epochs = 200
-historical_epochs = 0
-decay_epoch = 3
-save_every = 5
-loss_range = 1000
+epochs = 50
+historical_epochs = -1
+decay_epoch = 25
+save_every = 1
+loss_range = 5000
 
 # 创建输出目录
 if not os.path.exists(output_model_root):
@@ -229,11 +229,15 @@ for epoch in range(epochs-last_epoch):
     D_A_lr.step()
     D_B_lr.step()
 
+    G_A2B.eval()
+    G_B2A.eval()
+    D_A.eval()
+    D_B.eval()
     # 生成图片和保存模型
     if (epoch+1) % save_every == 0:
-        A2B_img, B2A_img = generate_images(G_A2B, G_B2A)
-        A2B_img.save(os.path.join(output_img_root, f'A2B_epoch{epoch+1}.png'))
-        B2A_img.save(os.path.join(output_img_root, f'B2A_epoch{epoch+1}.png'))
+        # A2B_img, B2A_img = generate_images(G_A2B, G_B2A)
+        # A2B_img.save(os.path.join(output_img_root, f'A2B_epoch{epoch+1}.png'))
+        # B2A_img.save(os.path.join(output_img_root, f'B2A_epoch{epoch+1}.png'))
 
         output_model_epoch_root = os.path.join(
             output_model_root, f'epoch{epoch+1}')

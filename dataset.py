@@ -12,8 +12,9 @@ class CycleDataset(Dataset):
     每个获取元素，将返回一个字典 {'A': A_Image, 'B': B_Image}
     """
 
-    def __init__(self, root, transform=None, mode='train'):
+    def __init__(self, root, transform=None, mode='train', type='min'):
         self.transform = transform
+        self.type = type
 
         a_dir = os.path.join(root, f'{mode}A')
         b_dir = os.path.join(root, f'{mode}B')
@@ -22,22 +23,20 @@ class CycleDataset(Dataset):
         self.b_files = sorted(glob.glob(b_dir+'/*.*'))
 
     def __getitem__(self, index):
-        if self.transform is None:
-            a = Image.open(self.a_files[index % len(self.a_files)])
-            b = Image.open(self.b_files[index % len(self.b_files)])
-        else:
-            a = self.transform(Image.open(
-                self.a_files[index % len(self.a_files)]))
-            b = self.transform(Image.open(
-                self.b_files[index % len(self.b_files)]))
+        a = Image.open(self.a_files[index % len(self.a_files)])
+        b = Image.open(self.b_files[index % len(self.b_files)])
+        if self.transform is not None:
+            a = self.transform(a)
+            b = self.transform(b)
 
-        return {
-            'A': a,
-            'B': b
-        }
+        return {'A': a,
+                'B': b,}
 
     def __len__(self):
-        return max(len(self.a_files), len(self.b_files))
+        if self.type == 'min':
+            return min(len(self.a_files), len(self.b_files))
+        else:
+            return max(len(self.a_files), len(self.b_files))
 
 if __name__ == '__main__':
     root = 'C:\code\cyclegan-demo\dataset\data'

@@ -25,5 +25,5 @@ class Resblk(nn.Module):
 
 
 if __name__ == '__main__':
-    R = Resblk(3)
+    R = Resblk(256)
     print(R)

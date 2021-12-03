@@ -47,5 +47,9 @@ class Discriminator(nn.Module):
 
 
 if __name__ == '__main__':
-    D = Discriminator(64)
+    D = Discriminator(256)
     print(D)
+
+    x = torch.randn(1,3,256,256)
+    output = D(x)
+    print(output)
